@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dstt-tools-core"
+version = "1.0.0"
+description = "Fundamental tool management and execution layer for the DSTT Kernel."
+readme = "spec.md"
+requires-python = ">=3.9"
+dependencies = [
+    "PyYAML>=6.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
