@@ -1,7 +1,7 @@
 import os
 import pytest
 from pathlib import Path
-from dstt_tools_core.lib.reason.reason_spec import ReasonSpecRegistry
+from dstt_tools_core.tools.reason.reason_spec import ReasonSpecRegistry
 
 @pytest.fixture
 def mock_yaml_directory(tmp_path):

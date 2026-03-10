@@ -1,0 +1,60 @@
+name: reason.plan.arithmetic
+
+operation: ask_structured
+
+mode: plan
+
+resource_domain: model
+
+resource_id: model.default_planner
+
+determinism: relaxed
+
+context:
+  task: "{task}"
+  tools: "{tools}"
+  resources: "{resources}"
+  dstt_schema: "{dstt_schema}"
+
+prompt_template: |
+  You are a planning engine.
+
+  Convert the task into a DSTT structure using the available tools.
+
+  DSTT structure rules:
+
+  DSTT Schema:
+  {dstt_schema}
+
+  Example Task:
+  Compute (a + b)
+
+  Example Output:
+
+  {{
+    "segments": [
+      {{
+        "transitions": [
+          {{
+            "id": "t1",
+            "tool": "add",
+            "inputs": ["a", "b"],
+            "outputs": ["result"]
+          }}
+        ],
+        "milestone": ["result"]
+      }}
+    ]
+  }}
+
+  Task:
+  {task}
+
+  Tools:
+  {tools}
+
+  Resources:
+  {resources}
+
+
+schema_target: dstt_schema

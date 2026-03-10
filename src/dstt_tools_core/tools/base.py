@@ -1,6 +1,6 @@
 import inspect
 from typing import Dict, Any, Callable
-from .interfaces import UniversalTool
+from dstt_tools_core.interfaces import UniversalTool
 
 class NativeTool(UniversalTool):
     """

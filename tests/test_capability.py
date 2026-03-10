@@ -2,10 +2,10 @@ import pytest
 from dstt_tools_core.registry import Registry
 from dstt_tools_core.provider import Provider
 from dstt_tools_core.resources.registry import ResourceRegistry
-from dstt_tools_core.lib.reason.reason_spec import ReasonSpecRegistry
-from dstt_tools_core.lib.reason.validators import ValidatorRegistry
-from dstt_tools_core.lib.reason.reason_tools import register_reasoning_tools
-from dstt_tools_core.lib.reason.capability_tools import register_capability_tools
+from dstt_tools_core.tools.reason.reason_spec import ReasonSpecRegistry
+from dstt_tools_core.tools.reason.validators import ValidatorRegistry
+from dstt_tools_core.tools.reason.reason_tools import register_reasoning_tools
+from dstt_tools_core.tools.reason.capability_tools import register_capability_tools
 
 class MockCapabilityEngine:
     """Simulates LLM evaluation over the tool constraints dynamically mapping the dictionaries."""

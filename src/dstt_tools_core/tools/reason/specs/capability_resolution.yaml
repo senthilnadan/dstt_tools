@@ -1,0 +1,41 @@
+mode: ask_structured
+
+resource_domain: model
+
+resource_id: model.default_reasoner
+
+determinism: relaxed
+
+context:
+  task: "{task}"
+  tools: "{tools}"
+
+prompt_template: |
+  You are a capability analyzer.
+
+  Your task is to determine whether the provided tools can solve the user task.
+
+  Task:
+  {task}
+
+  Available Tools:
+  {tools}
+
+  Instructions:
+
+  1. Identify the tools required to solve the task.
+  2. If all required tools exist, mark the task as satisfiable.
+  3. If tools are missing, list the missing capabilities.
+  4. Do not invent tools unless they are clearly required operations.
+
+  Output JSON only.
+
+  JSON Structure:
+
+  {
+    "satisfiable": true | false,
+    "required_tools": ["tool_name"],
+    "missing_tools": ["tool_name"]
+  }
+
+schema_target: capability_schema

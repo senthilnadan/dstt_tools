@@ -1,0 +1,60 @@
+name: reason.plan.strategySelect
+
+operation: ask_structured
+
+resource_domain: model
+resource_id: model.default_planner
+
+description: |
+  Select the appropriate planner strategy for the user task.
+
+inputs:
+  - task
+
+output_schema:
+  type: object
+  properties:
+    planner:
+      type: string
+      enum:
+        - reason.plan.arithmetic
+        - reason.plan.general
+        - reason.plan.iteration
+  required:
+    - planner
+
+prompt_template: |
+  You are selecting a planning strategy.
+
+  Available strategies:
+
+  reason.plan.arithmetic
+    - arithmetic computation tasks
+    - formulas or math expressions
+
+  reason.plan.general
+    - general reasoning tasks
+    - explanation or text generation
+
+  reason.plan.iteration
+    - tasks involving lists or repeated operations
+
+  Given the user task, return the planner strategy name.
+
+  Task:
+  {{task}}
+
+  Validate your output before sending it back to the user
+  Return only the planner name as a string.
+
+  GOOD Example:
+  Task: "What is the square root of 16?"
+  Output: "{{"planner": "reason.plan.arithmetic"}}"
+
+  
+  
+  
+determinism: relaxed
+
+
+

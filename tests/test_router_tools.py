@@ -2,7 +2,7 @@ import pytest
 from dstt_tools_core.registry import Registry
 from dstt_tools_core.provider import Provider
 from dstt_tools_core.tools import NativeTool
-from dstt_tools_core.lib.router_tools import register_router_tools
+from dstt_tools_core.tools.router_tools import register_router_tools
 
 # --- Native Math Helpers ---
 def is_even(val): return val % 2 == 0

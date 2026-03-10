@@ -26,7 +26,7 @@ def test_default_planner_integration():
     runner = ToolRunner()
     
     # We allow the ToolRunner to use its natively bootstrapped `OllamaResource` 
-    # for `model.default_planner`. We just rely on the real reasoning specs inside `dstt_tools_core/lib/reason/specs/`
+    # for `model.default_planner`. We just rely on the real reasoning specs inside `dstt_tools_core/tools/reason/specs/`
 
     runner.tool_registry.register("math.add", NativeTool(mock_add))
     runner.tool_registry.register("math.subtract", NativeTool(mock_sub))

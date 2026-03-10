@@ -1,5 +1,5 @@
 import pytest
-from dstt_tools_core.lib.reason.reason_spec import ReasonSpecRegistry, build_prompt
+from dstt_tools_core.tools.reason.reason_spec import ReasonSpecRegistry, build_prompt
 from dstt_tools_core.resources.registry import ResourceRegistry
 
 # --- Mock Handlers ---

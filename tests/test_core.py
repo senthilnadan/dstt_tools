@@ -2,6 +2,9 @@ import pytest
 from dstt_tools_core.registry import Registry
 from dstt_tools_core.provider import Provider
 from dstt_tools_core.tools import NativeTool
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import system_lib
 
 @pytest.fixture
@@ -82,7 +85,7 @@ def test_composite_tool_execution(registry, provider):
     assert result == 24
 
 def test_iterator_tools(registry, provider):
-    from dstt_tools_core.lib.iterator_tools import register_iteration_tools
+    from dstt_tools_core.tools.iterator_tools import register_iteration_tools
     register_iteration_tools(registry, provider)
     
     # Let's test `iterate` with square
@@ -121,7 +124,7 @@ def test_iterator_tools(registry, provider):
     assert total == 10
 
 def test_router_tools(registry, provider):
-    from dstt_tools_core.lib.router_tools import register_router_tools
+    from dstt_tools_core.tools.router_tools import register_router_tools
     register_router_tools(registry, provider)
     
     # 1. test switch_router

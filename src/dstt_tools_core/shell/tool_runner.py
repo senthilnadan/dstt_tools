@@ -6,10 +6,10 @@ from dstt_kernel.kernel import DsttKernal
 from dstt_tools_core.registry import Registry
 from dstt_tools_core.provider import Provider
 from dstt_tools_core.resources.registry import ResourceRegistry
-from dstt_tools_core.lib.reason.reason_spec import ReasonSpecRegistry
-from dstt_tools_core.lib.reason.validators import ValidatorRegistry
-from dstt_tools_core.lib.reason.reason_tools import register_reasoning_tools
-from dstt_tools_core.lib.reason.capability_tools import register_capability_tools
+from dstt_tools_core.tools.reason.reason_spec import ReasonSpecRegistry
+from dstt_tools_core.tools.reason.validators import ValidatorRegistry
+from dstt_tools_core.tools.reason.reason_tools import register_reasoning_tools
+from dstt_tools_core.tools.reason.capability_tools import register_capability_tools
 from dstt_tools_core.tool_spec import ToolSpecRegistry
 from dstt_tools_core.tool_specs import populate_default_spec_registry
 from dstt_tools_core.resources.ollama import OllamaResource
@@ -55,9 +55,9 @@ class ToolRunner:
     """
     def __init__(self, specs_directory: str = None):
         if not specs_directory:
-            # Default lookup to internal `src/.../lib/reason/specs/`
+            # Default lookup to internal `src/.../tools/reason/specs/`
             base_dir = Path(__file__).parent.parent
-            specs_directory = str(base_dir / "lib" / "reason" / "specs")
+            specs_directory = str(base_dir / "tools" / "reason" / "specs")
             
         self._bootstrap_registries(specs_directory)
         self._kernel = DsttKernal()
@@ -87,16 +87,22 @@ class ToolRunner:
         runner_tool = self.tool_registry.get_tool("reason.run")
         register_capability_tools(self.tool_registry, runner_tool)
         
-        from dstt_tools_core.lib.system.system import register_system_tools
+        from dstt_tools_core.tools.system.system import register_system_tools
         register_system_tools(self.tool_registry)
         
-        from dstt_tools_core.lib.system.math import register_math_tools
+        from dstt_tools_core.tools.system.math import register_math_tools
         register_math_tools(self.tool_registry)
         
         self.provider = Provider(self.tool_registry)
         
-        from dstt_tools_core.lib.bootstrap.bootstrap import register_bootstrap_tools
+        from dstt_tools_core.tools.bootstrap.bootstrap import register_bootstrap_tools
         register_bootstrap_tools(self.tool_registry, self.provider)
+        
+        from dstt_tools_core.tools.router_tools import register_router_tools
+        register_router_tools(self.tool_registry, self.provider)
+        
+        from dstt_tools_core.tools.iterator_tools import register_iteration_tools
+        register_iteration_tools(self.tool_registry, self.provider)
         
         # 3. Strategy Bindings dynamically instantiated as raw CompositeTools wrapping `reason.run` inside kernel scopes
         from dstt_tools_core.tool_specs.strategy_specs import STRATEGY_SPECS
@@ -147,11 +153,24 @@ class ToolRunner:
         
         
         # When reasoning tools return a dynamically generated string or dict (such as Ollama) it might be wrapped in the 'execution_dstt' payload key natively due to the spec
-        # Convert "reason.plan.arithmetic" -> "plan_arithmetic" to match the YAML file on disk perfectly
+        # Convert "reason.plan.arithmetic" -> "planArithmetic" to match the YAML file on disk perfectly
+        if planner_dstt_name == "reason.plan.arithmetic":
+            mapped_spec_id = "planArithmetic"
+        elif planner_dstt_name == "reason.plan.general":
+            mapped_spec_id = "planGeneral"
+        else:
+            mapped_spec_id = planner_dstt_name
 
+        # Ensure required spec template variables are satisfied for planArithmetic.yaml correctly
+        available_tools = [spec["name"] for spec in self.tool_spec_registry.get_all()]
+        available_resources = self.resource_registry.list()
+        
         planner_state = {
-            "plan_spec_id": planner_dstt_name,
-            "task": task
+            "plan_spec_id": mapped_spec_id,
+            "task": task,
+            "tools": available_tools,
+            "resources": available_resources,
+            "dstt_schema": DSTT_SCHEMA
         }
 
         print("planner_state =", planner_state)
@@ -163,8 +182,7 @@ class ToolRunner:
         print("bootstrap_planner type =", type(bootstrap_planner))
 
         execution_state = {
-
-             "plan_spec_id": planner_dstt_name,
+             "plan_spec_id": mapped_spec_id,
              "plan_inputs": planner_state
         }
 
@@ -175,24 +193,16 @@ class ToolRunner:
             initial_state=execution_state
         )
         
+        # The strategy spec deposits the generated graph into "execution_dstt"
+        generated_dstt = planner_output.get("execution_dstt")
+        if not generated_dstt:
+            raise ValueError(f"Planner failed to generate 'execution_dstt'. State: {planner_output}")
 
-        
-        bootstrap_planner = self.provider.lookup(planner_dstt_name)
-
-        print("bootstrap_planner =", bootstrap_planner)
-        print("bootstrap_planner type =", type(bootstrap_planner))
-        
-        plan_dstt = self._kernel.execute(
-            bootstrap_planner,
-            self.provider,
-            initial_state=execution_state
-        )
-
+        # Finally, execute the generated DSTT against the user's initial state
         final_state = self._kernel.execute(
-            plan_dstt,
+            generated_dstt,
             self.provider,
-            initial_state=execution_state
+            initial_state=input_state
         )
 
-        
         return final_state

@@ -1,5 +1,5 @@
 import pytest
-from dstt_tools_core.lib.reason.validators import (
+from dstt_tools_core.tools.reason.validators import (
     SchemaValidator, 
     DagValidator, 
     DsttValidator, 
